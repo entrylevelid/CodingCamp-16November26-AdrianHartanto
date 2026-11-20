@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Life Dashboard</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="js/app.js" defer></script>
+  </head>
+  <body>
+    <!-- Theme toggle (fixed position, rendered before widgets) -->
+    <div id="theme-toggle-container">
+      <button id="theme-toggle" aria-label="Toggle light/dark theme">🌙</button>
+    </div>
+
+    <main id="dashboard">
+      <!-- Greeting_Widget -->
+      <section id="greeting-widget" class="widget">
+        <span id="greeting-time" aria-live="polite"></span>
+        <span id="greeting-date"></span>
+        <p id="greeting-text" aria-live="polite"></p>
+        <form id="greeting-name-form">
+          <input
+            type="text"
+            id="greeting-name-input"
+            maxlength="50"
+            placeholder="Enter your name"
+            aria-label="Your name"
+          />
+          <button id="greeting-name-submit" type="submit">Set Name</button>
+        </form>
+      </section>
+
+      <!-- Timer_Widget -->
+      <section id="timer-widget" class="widget">
+        <span id="timer-display" aria-live="polite">25:00</span>
+        <div id="timer-controls">
+          <button id="timer-start">Start</button>
+          <button id="timer-stop" disabled>Stop</button>
+          <button id="timer-reset">Reset</button>
+        </div>
+        <label for="timer-duration">Session (min):
+          <input
+            id="timer-duration"
+            type="number"
+            min="1"
+            max="99"
+            step="1"
+            value="25"
+            aria-label="Session duration in minutes"
+          />
+        </label>
+      </section>
+
+      <!-- Todo_Widget -->
+      <section id="todo-widget" class="widget">
+        <h2>To-Do</h2>
+        <form id="todo-form">
+          <input
+            id="todo-input"
+            type="text"
+            maxlength="500"
+            placeholder="New task…"
+            aria-label="New task description"
+          />
+          <button type="submit">Add</button>
+        </form>
+        <span id="todo-validation" class="validation-msg" aria-live="polite"></span>
+        <ul id="todo-list"></ul>
+      </section>
+
+      <!-- Links_Widget -->
+      <section id="links-widget" class="widget">
+        <h2>Quick Links</h2>
+        <form id="links-form">
+          <input
+            id="link-label-input"
+            type="text"
+            placeholder="Label"
+            aria-label="Link label"
+          />
+          <input
+            id="link-url-input"
+            type="text"
+            placeholder="URL"
+            aria-label="Link URL"
+          />
+          <button type="submit">Add</button>
+        </form>
+        <span id="link-label-validation" class="validation-msg" aria-live="polite"></span>
+        <span id="link-url-validation" class="validation-msg" aria-live="polite"></span>
+        <ul id="links-list"></ul>
+      </section>
+    </main>
+  </body>
+</html>

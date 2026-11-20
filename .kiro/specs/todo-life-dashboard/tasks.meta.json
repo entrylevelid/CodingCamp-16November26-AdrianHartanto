@@ -1,0 +1,310 @@
+{
+  "pbtResults": {
+    "1.3 Write property tests for StorageService round-trip": {
+      "status": "passed",
+      "lastRunTimestamp": 1795185020739
+    },
+    "2.3 Write property test for theme toggle involution": {
+      "status": "passed",
+      "lastRunTimestamp": 1795185127779
+    }
+  },
+  "executionHistory": {
+    "1.1 Create the file layout: `index.html`, `css/style.css`, `js/app.js`": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183778572
+      },
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183788236
+      },
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183952748
+      }
+    ],
+    "1.2 Implement `StorageService` with `get`, `set`, and `remove` methods": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183778905
+      },
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183791074
+      },
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183955735
+      }
+    ],
+    "1.3 Write property tests for StorageService round-trip": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183779102
+      },
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183959431
+      },
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795185034415
+      }
+    ],
+    "2.1 Implement `ThemeController` with init and toggle behavior": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183779168
+      },
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183972974
+      },
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795185037741
+      }
+    ],
+    "2.2 Add CSS custom properties for light and dark themes to `style.css`": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183779267
+      },
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183976161
+      },
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795185040915
+      }
+    ],
+    "2.3 Write property test for theme toggle involution": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183779330
+      },
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795185044238
+      }
+    ],
+    "3. Checkpoint — StorageService and ThemeController": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183779388
+      }
+    ],
+    "4.1 Add Greeting_Widget markup to `index.html` and implement `GreetingController`": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183779453
+      },
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795185047325
+      }
+    ],
+    "4.2 Implement name submit handler": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183779515
+      }
+    ],
+    "4.3 Write property test for greeting prefix coverage": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183779573
+      }
+    ],
+    "4.4 Write property test for whitespace name rejection": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183779636
+      }
+    ],
+    "4.5 Write property test for name round-trip": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183779699
+      }
+    ],
+    "5.1 Add Timer_Widget markup to `index.html` and implement `TimerController`": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183779754
+      },
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795185050460
+      }
+    ],
+    "5.2 Implement countdown-to-zero alert and duration-change handling": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183779815
+      }
+    ],
+    "5.3 Write property test for session duration persistence": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183779872
+      }
+    ],
+    "6. Checkpoint — GreetingController and TimerController": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183779967
+      }
+    ],
+    "7.1 Add Todo_Widget markup to `index.html` and implement `TodoController` init and render": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183780037
+      }
+    ],
+    "7.2 Implement Add, Toggle, and Delete task handlers": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183780100
+      }
+    ],
+    "7.3 Implement Edit, Save, and Cancel handlers for tasks": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183780157
+      }
+    ],
+    "7.4 Write property test for task addition grows the list": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183780218
+      }
+    ],
+    "7.5 Write property test for whitespace task rejection": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183780274
+      }
+    ],
+    "7.6 Write property test for task toggle idempotence": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183780333
+      }
+    ],
+    "7.7 Write property test for task deletion": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183780396
+      }
+    ],
+    "7.8 Write property test for task edit round-trip": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183780452
+      }
+    ],
+    "8.1 Add Links_Widget markup to `index.html` and implement `LinksController` init and render": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183780512
+      }
+    ],
+    "8.2 Implement Add and Delete link handlers with URL normalization": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183780571
+      }
+    ],
+    "8.3 Write property test for URL normalization": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183780631
+      }
+    ],
+    "9. Checkpoint — TodoController and LinksController": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183780689
+      }
+    ],
+    "10.1 Implement `App` bootstrap in `app.js`": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183780755
+      }
+    ],
+    "10.2 Complete responsive layout in `style.css`": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183780812
+      }
+    ],
+    "10.3 Write integration tests for end-to-end persistence round-trip": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183780872
+      }
+    ],
+    "11. Final checkpoint — Full suite": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795183780931
+      }
+    ],
+    "1. Scaffold project structure and StorageService": [
+      {
+        "executionId": "20c7da7d-aeb3-4d76-b27b-91fea2690fe9",
+        "chatSessionId": "sess_df66a5fc-ecb2-4214-a3df-62973347c1d4",
+        "timestamp": 1795185034496
+      }
+    ]
+  }
+}

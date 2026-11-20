@@ -1,0 +1,12 @@
+{
+  "name": "todo-life-dashboard",
+  "version": "1.0.0",
+  "description": "Zero-dependency personal dashboard — tests only",
+  "type": "commonjs",
+  "scripts": {
+    "test:storage": "node tests/storage.test.js"
+  },
+  "devDependencies": {
+    "fast-check": "^3.22.0"
+  }
+}
