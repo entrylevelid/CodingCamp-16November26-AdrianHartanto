@@ -265,9 +265,7 @@ const GreetingController = (() => {
   function _renderGreeting(now, userName) {
     const el = document.getElementById("greeting-text");
     if (!el) return;
-    const prefix = _getPrefix(now.getHours());
-    const trimmed = userName ? userName.trim() : "";
-    el.textContent = trimmed.length > 0 ? `${prefix}, ${trimmed}` : prefix;
+    el.textContent = getGreeting(now.getHours(), userName);
   }
 
   // ── Interval tick ──────────────────────────────────────────────────────────
@@ -300,20 +298,47 @@ const GreetingController = (() => {
    */
   function _onNameSubmit(e) {
     e.preventDefault();
-    const input   = document.getElementById("greeting-name-input");
+    const input = document.getElementById("greeting-name-input");
     if (!input) return;
 
-    const trimmed = input.value.trim();
+    const saved = setName(input.value);
+    input.value = saved === null ? "" : saved;
+  }
+
+  /**
+   * Persist (or clear) the user name and re-render the greeting.
+   * Whitespace-only / empty values remove the stored name.
+   *
+   * @param {string} value
+   * @returns {string|null} The stored name, or null when cleared.
+   */
+  function setName(value) {
+    const trimmed = String(value === undefined || value === null ? "" : value)
+      .trim()
+      .slice(0, 50);
 
     if (trimmed.length > 0) {
       StorageService.set(StorageService.KEY_USER_NAME, trimmed);
     } else {
       StorageService.remove(StorageService.KEY_USER_NAME);
-      input.value = "";
     }
 
     // Re-render greeting immediately (within 500 ms, synchronous DOM write).
     _renderGreeting(new Date(), trimmed.length > 0 ? trimmed : null);
+    return trimmed.length > 0 ? trimmed : null;
+  }
+
+  /**
+   * Build the full greeting string for a given hour and optional name.
+   *
+   * @param {number}      hour
+   * @param {string|null} userName
+   * @returns {string}
+   */
+  function getGreeting(hour, userName) {
+    const prefix  = _getPrefix(hour);
+    const trimmed = typeof userName === "string" ? userName.trim() : "";
+    return trimmed.length > 0 ? `${prefix}, ${trimmed}` : prefix;
   }
 
   // ── Public API ─────────────────────────────────────────────────────────────
@@ -346,8 +371,8 @@ const GreetingController = (() => {
     setInterval(_tick, 1000);
   }
 
-  // Expose _getPrefix for unit / property tests.
-  return { init, _getPrefix };
+  // Expose helpers for unit / property tests.
+  return { init, setName, getGreeting, _getPrefix };
 })();
 
 // =============================================================================
@@ -441,6 +466,15 @@ const TimerController = (() => {
 
   function _start() {
     if (status === "running") return;
+    // Finished session: Start begins a fresh countdown instead of
+    // immediately re-firing the alert at 00:00.
+    if (remaining <= 0) {
+      if (pendingDuration !== null) {
+        sessionDuration = pendingDuration;
+        pendingDuration = null;
+      }
+      remaining = sessionDuration * 60;
+    }
     status     = "running";
     intervalId = setInterval(_tick, 1000);
     _render();
@@ -478,19 +512,38 @@ const TimerController = (() => {
 
   // ── Duration change handler ────────────────────────────────────────────
   function _onDurationChange(e) {
-    const raw      = parseInt(e.target.value, 10);
-    const clamped  = isNaN(raw) ? 25 : Math.max(1, Math.min(99, raw));
+    const clamped = setDuration(e.target.value);
+    // Reflect the clamped value back into the input.
+    e.target.value = clamped;
+  }
+
+  /**
+   * Change the session duration (minutes). Clamped to 1–99.
+   * Persisted immediately; applied now when not running, or on next Reset
+   * when running.
+   *
+   * @param {number|string} value
+   * @returns {number} the clamped value
+   */
+  function setDuration(value) {
+    const raw     = parseInt(value, 10);
+    const clamped = isNaN(raw) ? sessionDuration : Math.max(1, Math.min(99, raw));
+
+    // Req 3.11: always persist the new value.
+    StorageService.set(StorageService.KEY_SESSION_DURATION, clamped);
 
     if (status === "running") {
-      // Store pending; apply on next Reset.
+      // Req 3.13: store pending; apply on next Reset.
       pendingDuration = clamped;
     } else {
+      // Req 3.12: not running → reset the display immediately.
       sessionDuration = clamped;
       pendingDuration = null;
-      StorageService.set(StorageService.KEY_SESSION_DURATION, sessionDuration);
       remaining = sessionDuration * 60;
+      status    = "reset";
       _render();
     }
+    return clamped;
   }
 
   // ── Public init ────────────────────────────────────────────────────────
@@ -529,6 +582,10 @@ const TimerController = (() => {
   // Expose internals used by tests (prefixed with _ to signal internal use).
   return {
     init,
+    start: _start,
+    stop:  _stop,
+    reset: _reset,
+    setDuration,
     // Test-visible state accessors
     getStatus()          { return status; },
     getRemaining()       { return remaining; },
@@ -538,18 +595,421 @@ const TimerController = (() => {
 })();
 
 // =============================================================================
-// TodoController — stub (implemented in task 7.1)
+// Shared helpers
 // =============================================================================
-const TodoController = {
-  init() {},
-};
+
+/** Generate a unique id; falls back for browsers without crypto.randomUUID. */
+function generateId() {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+}
+
+/** Create an element with optional class name and text content. */
+function createEl(tag, className, text) {
+  const el = document.createElement(tag);
+  if (className) el.className = className;
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
 
 // =============================================================================
-// LinksController — stub (implemented in task 8.1)
+// TodoController
+// Drives the Todo_Widget: add, toggle, edit (inline), delete.
+//
+// DOM nodes used:
+//   #todo-form        — add form
+//   #todo-input       — new task text input (maxlength 500)
+//   #todo-validation  — inline validation message for the add form
+//   #todo-list        — <ul> rebuilt from the in-memory tasks array
+//
+// Task: { id: string, description: string, completed: boolean }
 // =============================================================================
-const LinksController = {
-  init() {},
-};
+const TodoController = (() => {
+  const MAX_LENGTH = 500;
+  const EMPTY_MSG  = "Please enter a task description.";
+
+  /** In-memory model, in insertion order. */
+  let tasks = [];
+
+  function _el(id) { return document.getElementById(id); }
+
+  /** Return true when a value looks like a valid Task record. */
+  function _isTask(t) {
+    return t !== null && typeof t === "object" &&
+      typeof t.id === "string" &&
+      typeof t.description === "string" &&
+      typeof t.completed === "boolean";
+  }
+
+  /** Normalize a raw description; returns null when it is empty/invalid. */
+  function _clean(raw) {
+    const trimmed = String(raw === undefined || raw === null ? "" : raw).trim();
+    if (trimmed.length === 0) return null;
+    return trimmed.slice(0, MAX_LENGTH);
+  }
+
+  function _persist() {
+    StorageService.set(StorageService.KEY_TODOS, tasks);
+  }
+
+  function _setValidation(msg) {
+    const v = _el("todo-validation");
+    if (v) v.textContent = msg;
+  }
+
+  // ── Model operations (persist + re-render) ──────────────────────────────
+
+  /** Load tasks from storage, dropping malformed entries. */
+  function load() {
+    const stored = StorageService.get(StorageService.KEY_TODOS);
+    tasks = Array.isArray(stored) ? stored.filter(_isTask) : [];
+    return getTasks();
+  }
+
+  /**
+   * Add a task. Returns the new Task, or null when the description is
+   * empty / whitespace-only (no task added, validation message shown).
+   */
+  function add(description) {
+    const clean = _clean(description);
+    if (clean === null) {
+      _setValidation(EMPTY_MSG);
+      return null;
+    }
+    const task = { id: generateId(), description: clean, completed: false };
+    tasks.push(task);
+    _setValidation("");
+    _persist();
+    render();
+    return { ...task };
+  }
+
+  /** Flip the completed state of the task with the given id. */
+  function toggle(id) {
+    const task = tasks.find(t => t.id === id);
+    if (!task) return false;
+    task.completed = !task.completed;
+    _persist();
+    render();
+    return true;
+  }
+
+  /** Remove the task with the given id. */
+  function remove(id) {
+    const idx = tasks.findIndex(t => t.id === id);
+    if (idx === -1) return false;
+    tasks.splice(idx, 1);
+    _persist();
+    render();
+    return true;
+  }
+
+  /**
+   * Update the description of a task. Returns false (and changes nothing)
+   * when the new description is empty or the id is unknown.
+   */
+  function edit(id, description) {
+    const task = tasks.find(t => t.id === id);
+    if (!task) return false;
+    const clean = _clean(description);
+    if (clean === null) return false;
+    task.description = clean;
+    _persist();
+    render();
+    return true;
+  }
+
+  /** Return a defensive copy of the current task list. */
+  function getTasks() {
+    return tasks.map(t => ({ ...t }));
+  }
+
+  // ── Rendering ───────────────────────────────────────────────────────────
+
+  /** Build a task row in display mode. */
+  function _buildDisplayRow(task) {
+    const li = createEl("li", "task-item");
+    li.dataset.id = task.id;
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.className = "task-toggle";
+    checkbox.checked = task.completed;
+    checkbox.setAttribute("aria-label",
+      task.completed ? "Mark task as incomplete" : "Mark task as complete");
+    checkbox.addEventListener("change", () => toggle(task.id));
+
+    const span = createEl("span", "task-description", task.description);
+    if (task.completed) span.classList.add("completed");
+
+    const editBtn = createEl("button", "task-edit-btn", "Edit");
+    editBtn.type = "button";
+    editBtn.addEventListener("click", () => _startEdit(li, task));
+
+    const deleteBtn = createEl("button", "task-delete-btn", "Delete");
+    deleteBtn.type = "button";
+    deleteBtn.addEventListener("click", () => remove(task.id));
+
+    li.append(checkbox, span, editBtn, deleteBtn);
+    return li;
+  }
+
+  /** Swap a row into inline edit mode. */
+  function _startEdit(li, task) {
+    li.textContent = "";
+    li.classList.add("editing");
+
+    const form = createEl("form", "task-edit-form");
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "task-edit-input";
+    input.maxLength = MAX_LENGTH;
+    input.value = task.description;
+    input.setAttribute("aria-label", "Edit task description");
+
+    const saveBtn = createEl("button", "task-save-btn", "Save");
+    saveBtn.type = "submit";
+
+    const cancelBtn = createEl("button", "task-cancel-btn", "Cancel");
+    cancelBtn.type = "button";
+
+    const msg = createEl("span", "validation-msg");
+    msg.setAttribute("aria-live", "polite");
+
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      if (!edit(task.id, input.value)) {
+        msg.textContent = EMPTY_MSG;
+        input.focus();
+      }
+    });
+    // Cancel: discard in-flight changes, no persistence write.
+    cancelBtn.addEventListener("click", () => render());
+    input.addEventListener("keydown", e => {
+      if (e.key === "Escape") render();
+    });
+
+    form.append(input, saveBtn, cancelBtn, msg);
+    li.append(form);
+    input.focus();
+    input.select();
+  }
+
+  /** Clear and rebuild the list from the in-memory array. */
+  function render() {
+    const list = _el("todo-list");
+    if (!list) return;
+    list.textContent = "";
+    if (tasks.length === 0) {
+      list.append(createEl("li", "empty-state", "No tasks yet — add one above."));
+      return;
+    }
+    tasks.forEach(t => list.append(_buildDisplayRow(t)));
+  }
+
+  // ── Public init ─────────────────────────────────────────────────────────
+
+  function init() {
+    load();
+
+    const form  = _el("todo-form");
+    const input = _el("todo-input");
+    if (form && input) {
+      form.addEventListener("submit", e => {
+        e.preventDefault();
+        if (add(input.value)) {
+          input.value = "";
+        }
+        input.focus();
+      });
+      input.addEventListener("input", () => _setValidation(""));
+    }
+
+    render();
+  }
+
+  return { init, load, add, toggle, remove, edit, getTasks, render };
+})();
+
+// =============================================================================
+// LinksController
+// Drives the Links_Widget: add, open, delete quick links.
+//
+// DOM nodes used:
+//   #links-form             — add form
+//   #link-label-input       — label input
+//   #link-url-input         — URL input
+//   #link-label-validation  — inline message for an empty label
+//   #link-url-validation    — inline message for an empty URL
+//   #links-list             — <ul> rebuilt from the in-memory links array
+//
+// Link: { id: string, label: string, url: string }
+// =============================================================================
+const LinksController = (() => {
+  const LABEL_MSG = "Please enter a label.";
+  const URL_MSG   = "Please enter a URL.";
+
+  /** In-memory model, in insertion order. */
+  let links = [];
+
+  function _el(id) { return document.getElementById(id); }
+
+  function _isLink(l) {
+    return l !== null && typeof l === "object" &&
+      typeof l.id === "string" &&
+      typeof l.label === "string" &&
+      typeof l.url === "string";
+  }
+
+  /**
+   * Ensure a URL starts with http:// or https://. When it does not,
+   * prepend "https://" exactly once.
+   *
+   * @param {string} raw
+   * @returns {string}
+   */
+  function normalizeUrl(raw) {
+    const trimmed = String(raw).trim();
+    return /^https?:\/\//i.test(trimmed) ? trimmed : "https://" + trimmed;
+  }
+
+  function _persist() {
+    StorageService.set(StorageService.KEY_LINKS, links);
+  }
+
+  function _setValidation(labelMsg, urlMsg) {
+    const l = _el("link-label-validation");
+    const u = _el("link-url-validation");
+    if (l) l.textContent = labelMsg;
+    if (u) u.textContent = urlMsg;
+  }
+
+  // ── Model operations ────────────────────────────────────────────────────
+
+  function load() {
+    const stored = StorageService.get(StorageService.KEY_LINKS);
+    links = Array.isArray(stored) ? stored.filter(_isLink) : [];
+    return getLinks();
+  }
+
+  /**
+   * Add a link. Returns { link } on success, or { errors: { label?, url? } }
+   * with one entry per empty field (nothing is added in that case).
+   */
+  function add(label, url) {
+    const cleanLabel = String(label === undefined || label === null ? "" : label).trim();
+    const cleanUrl   = String(url === undefined || url === null ? "" : url).trim();
+
+    const errors = {};
+    if (cleanLabel.length === 0) errors.label = LABEL_MSG;
+    if (cleanUrl.length === 0)   errors.url   = URL_MSG;
+
+    _setValidation(errors.label || "", errors.url || "");
+    if (errors.label || errors.url) return { errors };
+
+    const link = { id: generateId(), label: cleanLabel, url: normalizeUrl(cleanUrl) };
+    links.push(link);
+    _persist();
+    render();
+    return { link: { ...link } };
+  }
+
+  function remove(id) {
+    const idx = links.findIndex(l => l.id === id);
+    if (idx === -1) return false;
+    links.splice(idx, 1);
+    _persist();
+    render();
+    return true;
+  }
+
+  /** Open a stored link in a new tab. */
+  function open(id) {
+    const link = links.find(l => l.id === id);
+    if (!link) return false;
+    window.open(link.url, "_blank", "noopener,noreferrer");
+    return true;
+  }
+
+  function getLinks() {
+    return links.map(l => ({ ...l }));
+  }
+
+  // ── Rendering ───────────────────────────────────────────────────────────
+
+  function _buildRow(link) {
+    const li = createEl("li", "link-item");
+    li.dataset.id = link.id;
+
+    const btn = createEl("button", "link-btn");
+    btn.type = "button";
+    btn.title = link.url;
+    btn.append(
+      createEl("span", "link-label", link.label),
+      createEl("span", "link-url", link.url)
+    );
+    btn.addEventListener("click", () => open(link.id));
+
+    const del = createEl("button", "link-delete-btn", "✕");
+    del.type = "button";
+    del.setAttribute("aria-label", `Delete link ${link.label}`);
+    del.addEventListener("click", () => remove(link.id));
+
+    li.append(btn, del);
+    return li;
+  }
+
+  function render() {
+    const list = _el("links-list");
+    if (!list) return;
+    list.textContent = "";
+    if (links.length === 0) {
+      list.append(createEl("li", "empty-state", "No links yet — add a favorite site."));
+      return;
+    }
+    links.forEach(l => list.append(_buildRow(l)));
+  }
+
+  // ── Public init ─────────────────────────────────────────────────────────
+
+  function init() {
+    load();
+
+    const form       = _el("links-form");
+    const labelInput = _el("link-label-input");
+    const urlInput   = _el("link-url-input");
+    if (form && labelInput && urlInput) {
+      form.addEventListener("submit", e => {
+        e.preventDefault();
+        const result = add(labelInput.value, urlInput.value);
+        if (result.link) {
+          labelInput.value = "";
+          urlInput.value = "";
+          labelInput.focus();
+        } else if (result.errors.label) {
+          labelInput.focus();
+        } else {
+          urlInput.focus();
+        }
+      });
+      labelInput.addEventListener("input", () => {
+        const l = _el("link-label-validation");
+        if (l) l.textContent = "";
+      });
+      urlInput.addEventListener("input", () => {
+        const u = _el("link-url-validation");
+        if (u) u.textContent = "";
+      });
+    }
+
+    render();
+  }
+
+  return { init, load, add, remove, open, getLinks, normalizeUrl, render };
+})();
 
 // =============================================================================
 // App — bootstrap
@@ -567,3 +1027,17 @@ const App = {
 };
 
 document.addEventListener("DOMContentLoaded", () => App.init());
+
+// Expose controllers to Node-based tests. Ignored in the browser, where
+// `module` is undefined.
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = {
+    StorageService,
+    ThemeController,
+    GreetingController,
+    TimerController,
+    TodoController,
+    LinksController,
+    App,
+  };
+}

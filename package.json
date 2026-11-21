@@ -4,6 +4,7 @@
   "description": "Zero-dependency personal dashboard — tests only",
   "type": "commonjs",
   "scripts": {
+    "test": "node tests/run-all.js",
     "test:storage": "node tests/storage.test.js"
   },
   "devDependencies": {
